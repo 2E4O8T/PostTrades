@@ -1,0 +1,38 @@
+meta {
+  name: POST
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://localhost:7024/api/Bids
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "bidId": 0,
+    "account": "string",
+    "bidType": "string",
+    "bidQuantity": 0,
+    "askQuantity": 0,
+    "bidAmount": 0,
+    "askAmount": 0,
+    "benchmark": "string",
+    "bidListDate": "2024-01-29T14:55:16.825Z",
+    "commentary": "string",
+    "bidSecurity": "string",
+    "bidStatus": "string",
+    "trader": "string",
+    "book": "string",
+    "creationName": "string",
+    "creationDate": "2024-01-29T14:55:16.825Z",
+    "revisionName": "string",
+    "revisionDate": "2024-01-29T14:55:16.825Z",
+    "dealName": "string",
+    "dealType": "string",
+    "sourceListId": "string",
+    "side": "string"
+  }
+}

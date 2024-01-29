@@ -1,0 +1,38 @@
+meta {
+  name: UPDATE
+  type: http
+  seq: 4
+}
+
+put {
+  url: https://localhost:7024/api/Bids/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "bidId": 1,
+    "account": "tototo",
+    "bidType": "string",
+    "bidQuantity": 0,
+    "askQuantity": 0,
+    "bidAmount": 0,
+    "askAmount": 0,
+    "benchmark": "string",
+    "bidListDate": "2024-01-29T14:55:16.825Z",
+    "commentary": "string",
+    "bidSecurity": "string",
+    "bidStatus": "string",
+    "trader": "string",
+    "book": "string",
+    "creationName": "string",
+    "creationDate": "2024-01-29T14:55:16.825Z",
+    "revisionName": "string",
+    "revisionDate": "2024-01-29T14:55:16.825Z",
+    "dealName": "string",
+    "dealType": "string",
+    "sourceListId": "string",
+    "side": "string"
+  }
+}
