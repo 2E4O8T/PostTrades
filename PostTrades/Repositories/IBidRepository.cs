@@ -9,6 +9,5 @@ namespace PostTrades.Repositories
         Task<int> CreateAsync(Bid bid);
         Task UpdateAsync(Bid bid);
         Task<int> DeleteAsync(int id);
-
     }
 }
