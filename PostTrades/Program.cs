@@ -10,6 +10,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add logging
+builder.Host.ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+});
+
 // Add services to the container.
 
 // Add database connection

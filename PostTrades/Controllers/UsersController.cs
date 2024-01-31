@@ -39,7 +39,7 @@ namespace PostTrades.Controllers
             return Ok(user);
         }
         #endregion
-                #region DELETE
+        #region DELETE
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]

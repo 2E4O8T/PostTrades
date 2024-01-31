@@ -9,65 +9,164 @@ namespace PostTrades.Controllers
     public class BidsController : ControllerBase
     {
         private readonly IBidRepository _bidRepository;
+        private readonly ILogger<BidsController> _logger;
 
-        public BidsController(IBidRepository bidRepository)
+        public BidsController(IBidRepository bidRepository, ILogger<BidsController> logger)
         {
-            _bidRepository = bidRepository;
+            _bidRepository = bidRepository ?? throw new ArgumentNullException(nameof(bidRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        #region GET ALL
+
+        /// <summary>
+        /// Retrieve all Bids.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<Bid>>> GetAllBids()
         {
-            var bids = await _bidRepository.GetAllAsync();
+            try
+            {
+                var bids = await _bidRepository.GetAllAsync();
 
-            return Ok(bids);
+                if (bids == null)
+                {
+                    _logger.LogInformation("No Bid found");
+
+                return NotFound();
+                }
+
+                _logger.LogInformation($"List of Bids retrieved successfully at {DateTime.UtcNow.ToLongTimeString() + 1}");
+
+                return Ok(bids);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving Bids");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        #endregion
-        #region GET BY ID
+
+        /// <summary>
+        /// Retrieve a specific Bid by ID.
+        /// </summary>
+        /// <param name="id">Bid ID</param>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Bid>> GetBidById(int id)
         {
-            var bid = await _bidRepository.GetByIdAsync(id);
+            try
+            {
+                var bid = await _bidRepository.GetByIdAsync(id);
 
-            return Ok(bid);
+                if (bid == null)
+                {
+                    _logger.LogInformation($"Bid {id} not found");
+
+                    return NotFound();
+                }
+
+                _logger.LogInformation($"Bid {id} retrieved successfully at {DateTime.UtcNow.ToLongTimeString() + 1}");
+
+                return Ok(bid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving Bid {id}");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        #endregion
-        #region POST
+
+        /// <summary>
+        /// Create a new Bid.
+        /// </summary>
+        /// <param name="bid">Bid object</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Bid>> CreateBid(Bid bid)
         {
-            await _bidRepository.CreateAsync(bid);
+            try
+            {
+                if (bid == null)
+                {
+                    _logger.LogError("Invalid Bid data");
 
-            return CreatedAtAction("GetBidById", new { id = bid.BidId }, bid);
+                    return BadRequest();
+                }
+
+                await _bidRepository.CreateAsync(bid);
+                _logger.LogInformation($"New Bid created successfully at {DateTime.UtcNow.ToLongTimeString() + 1}");
+
+                return CreatedAtAction(nameof(GetBidById), new { id = bid.BidId }, bid);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating new Bid");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        #endregion
-        #region PUT
+
+        /// <summary>
+        /// Update a Bid.
+        /// </summary>
+        /// <param name="id">Bid ID</param>
+        /// <param name="bid">Bid object</param>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> UpdateBid(int id, Bid bid)
         {
-            await _bidRepository.UpdateAsync(bid);
+            try
+            {
+                if (id != bid?.BidId)
+                {
+                    _logger.LogError($"Bid {id} mismatch");
 
-            return NoContent();
+                    return BadRequest();
+                }
+
+                await _bidRepository.UpdateAsync(bid);
+                _logger.LogInformation($"Bid {id} updated successfully at {DateTime.UtcNow.ToLongTimeString() + 1}");
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating Bid {id}");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        #endregion
-        #region DELETE
+
+        /// <summary>
+        /// Delete a Bid by ID.
+        /// </summary>
+        /// <param name="id">Bid ID</param>
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteBid(int id)
         {
-            await _bidRepository.DeleteAsync(id);
+            try
+            {
+                await _bidRepository.DeleteAsync(id);
+                _logger.LogInformation($"Bid {id} deleted successfully at {DateTime.UtcNow.ToLongTimeString() + 1}");
 
-            return NoContent();
+                return NoContent();
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting Bid {id}");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        #endregion
     }
 }
